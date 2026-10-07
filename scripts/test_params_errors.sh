@@ -11,7 +11,7 @@ fails "--log без значения" --log
 fails "--script без значения" --script
 
 echo "== недоступный лог-файл при остальных параметрах"
-fails "лог в несуществующей папке" --vfs /path/to/vfs.xml \
+fails "лог в несуществующей папке" --vfs vfs/minimal.xml \
     --log /no/such/dir/log.xml --script scripts/startup_ok.emu
 has "$TMP/stderr.txt" "лог-файл" "сообщение об ошибке лога"
 

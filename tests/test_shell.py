@@ -4,6 +4,7 @@ import unittest
 
 from src.commands import CommandError, ExitRequest, Shell
 from src.eventlog import EventLog
+from src.vfs import VDir, VFile
 
 
 def first_event(log):
@@ -42,6 +43,27 @@ class ShellTest(unittest.TestCase):
         """exit с аргументами - ошибка."""
         with self.assertRaises(CommandError):
             Shell().execute("exit 1")
+
+
+class TreeTest(unittest.TestCase):
+    """Проверки служебной команды tree."""
+
+    def test_tree_default_vfs(self):
+        """tree показывает содержимое VFS по умолчанию."""
+        out = Shell().execute("tree")
+        self.assertIn("readme.txt", out)
+        self.assertIn("hello.txt", out)
+
+    def test_tree_custom_vfs(self):
+        """tree показывает переданную VFS."""
+        root = VDir("")
+        root.add(VFile("only.txt"))
+        self.assertEqual(Shell(vfs=root).execute("tree"), "/\nonly.txt")
+
+    def test_tree_with_args_is_error(self):
+        """tree с аргументами - ошибка."""
+        with self.assertRaises(CommandError):
+            Shell().execute("tree x")
 
 
 class ShellLogTest(unittest.TestCase):

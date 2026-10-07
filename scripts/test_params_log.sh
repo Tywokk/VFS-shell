@@ -1,7 +1,7 @@
 #!/bin/sh
 # XML-лог: события, время, аргументы, ошибка; остановка скрипта на ошибке.
 . "$(dirname "$0")/lib.sh"
-VFS=/path/to/vfs.xml
+VFS=vfs/minimal.xml
 
 echo "== скрипт без ошибок: все параметры"
 run_emulator --vfs "$VFS" --log "$TMP/ok.xml" \

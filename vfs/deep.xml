@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vfs>
+  <dir name="home">
+    <dir name="user">
+      <dir name="docs">
+        <file name="report.txt">Отчёт</file>
+        <dir name="old">
+          <file name="draft.txt">Черновик</file>
+        </dir>
+      </dir>
+      <file name="notes.txt">Заметки</file>
+    </dir>
+  </dir>
+  <dir name="etc">
+    <file name="hostname">emulator</file>
+  </dir>
+  <file name="readme.txt">Три и более уровня вложенности</file>
+</vfs>

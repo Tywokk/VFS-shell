@@ -39,6 +39,14 @@ fails() {
     fi
 }
 
+check_vfs() {
+    run_emulator --vfs "$1" --log "$TMP/log.xml" \
+        --script scripts/startup_ok.emu > "$TMP/out.txt"
+    has "$TMP/out.txt" "vfs    = $1" "параметр --vfs: $1"
+    has "$TMP/out.txt" "$2" "$3"
+    has "$TMP/log.xml" "<command>tree</command>" "команда tree выполнена"
+}
+
 finish() {
     rm -rf "$TMP"
     echo "Провалено проверок: $FAILS"

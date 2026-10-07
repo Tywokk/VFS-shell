@@ -4,4 +4,5 @@ ls -l /home
 
 cd docs
 cd
+tree
 exit

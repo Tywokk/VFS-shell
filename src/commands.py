@@ -1,7 +1,8 @@
-"""Команды эмулятора: заглушки ls, cd и команда exit."""
+"""Команды эмулятора: заглушки ls, cd, служебная tree и exit."""
 
 from src.eventlog import EventLog
 from src.parser import parse
+from src.vfs import default_vfs, tree_lines
 
 
 class CommandError(Exception):
@@ -38,10 +39,16 @@ def cmd_exit(args):
 class Shell:
     """Интерпретатор: выполняет команды и записывает их в журнал."""
 
-    def __init__(self, log=None):
-        """Зарегистрировать команды; log - журнал событий."""
+    def __init__(self, log=None, vfs=None):
+        """Зарегистрировать команды; log - журнал, vfs - файловая система."""
         self.log = log or EventLog(None)
-        self.commands = {"ls": cmd_ls, "cd": cmd_cd, "exit": cmd_exit}
+        self.vfs = vfs or default_vfs()
+        self.commands = {
+            "ls": cmd_ls,
+            "cd": cmd_cd,
+            "tree": self._tree,
+            "exit": cmd_exit,
+        }
 
     def execute(self, line):
         """Выполнить строку ввода и вернуть текст вывода.
@@ -72,3 +79,9 @@ class Shell:
         if handler is None:
             raise CommandError(f"{name}: команда не найдена")
         return handler(args)
+
+    def _tree(self, args):
+        """Служебная команда tree: показать всё содержимое VFS."""
+        if args:
+            raise CommandError("tree: слишком много аргументов")
+        return "\n".join(["/"] + tree_lines(self.vfs))

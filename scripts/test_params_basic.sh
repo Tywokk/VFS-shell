@@ -2,7 +2,7 @@
 # Каждый параметр (--vfs, --log, --script) отдельно и все три вместе.
 # Окно без стартового скрипта остаётся открытым, его закрывает таймаут.
 . "$(dirname "$0")/lib.sh"
-VFS=/path/to/vfs.xml
+VFS=vfs/minimal.xml
 
 echo "== --vfs отдельно"
 run_emulator --vfs "$VFS" > "$TMP/o1.txt"

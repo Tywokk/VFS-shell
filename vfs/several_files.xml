@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vfs>
+  <file name="readme.txt">Несколько файлов в корне</file>
+  <file name="notes.txt">Заметки</file>
+  <file name="data.bin" encoding="base64">AAECA/8=</file>
+  <file name="empty.txt"></file>
+</vfs>

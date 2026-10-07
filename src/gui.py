@@ -5,6 +5,7 @@ from tkinter import scrolledtext
 
 from src.commands import CommandError, ExitRequest
 from src.config import debug_lines, vfs_name
+from src.vfs import summary
 
 TITLE_TEMPLATE = "Эмулятор оболочки [VFS: {}]"
 PROMPT = "user@vfs:~$"
@@ -54,8 +55,9 @@ class App:
         self.output.config(state="disabled")
 
     def show_debug(self):
-        """Вывести все заданные параметры в окно и в консоль."""
-        for line in debug_lines(self.args):
+        """Вывести параметры и сведения о VFS в окно и в консоль."""
+        lines = debug_lines(self.args) + [summary(self.shell.vfs)]
+        for line in lines:
             print(line, flush=True)
             self.write(line + "\n", DEBUG_TAG)
 
