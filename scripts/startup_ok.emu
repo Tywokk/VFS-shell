@@ -1,0 +1,7 @@
+# Стартовый скрипт без ошибок
+ls
+ls -l /home
+
+cd docs
+cd
+exit

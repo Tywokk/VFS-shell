@@ -9,3 +9,4 @@ dist/
 *.zip
 *.tar.gz
 *.log
+log.xml

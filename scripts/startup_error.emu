@@ -1,0 +1,6 @@
+# Скрипт с ошибкой: выполнение останавливается на foo
+ls
+cd /tmp
+foo bar
+cd after_error
+exit
