@@ -5,6 +5,7 @@ import os
 
 UNSET = "(не задан)"
 DEFAULT_VFS_NAME = "default"
+USER_NAME = "user"
 
 
 def parse_args(argv=None):

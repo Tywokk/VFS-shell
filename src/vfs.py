@@ -9,6 +9,9 @@ FILE_TAG = "file"
 ENCODING_ATTR = "encoding"
 BASE64 = "base64"
 INDENT = "  "
+SEP = "/"
+CURRENT = "."
+PARENT = ".."
 
 
 class VfsError(Exception):
@@ -108,6 +111,34 @@ def get_vfs(path):
     if path is None:
         return default_vfs()
     return load_vfs(path)
+
+
+def normalize(cwd, path):
+    """Вернуть список имён абсолютного пути.
+
+    Args:
+        cwd: текущий каталог, список имён от корня.
+        path: абсолютный (с /) или относительный путь; поддерживаются
+            "." и "..", выше корня подняться нельзя.
+    """
+    parts = [] if path.startswith(SEP) else list(cwd)
+    for name in path.split(SEP):
+        if name == PARENT:
+            if parts:
+                parts.pop()
+        elif name and name != CURRENT:
+            parts.append(name)
+    return parts
+
+
+def lookup(root, parts):
+    """Найти узел по списку имён от корня; None, если его нет."""
+    node = root
+    for name in parts:
+        if not isinstance(node, VDir) or name not in node.children:
+            return None
+        node = node.children[name]
+    return node
 
 
 def tree_lines(directory, depth=0):

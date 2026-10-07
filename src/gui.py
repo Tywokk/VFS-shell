@@ -4,11 +4,11 @@ import tkinter as tk
 from tkinter import scrolledtext
 
 from src.commands import CommandError, ExitRequest
-from src.config import debug_lines, vfs_name
+from src.config import USER_NAME, debug_lines, vfs_name
 from src.vfs import summary
 
 TITLE_TEMPLATE = "Эмулятор оболочки [VFS: {}]"
-PROMPT = "user@vfs:~$"
+PROMPT_TEMPLATE = "{}@vfs:{}$"
 COMMENT = "#"
 STATUS_OK = "ok"
 STATUS_ERROR = "error"
@@ -41,11 +41,16 @@ class App:
         """Создать строку ввода с приглашением."""
         row = tk.Frame(self.root)
         row.pack(fill="x")
-        tk.Label(row, text=PROMPT, font=FONT).pack(side="left")
+        self.prompt_label = tk.Label(row, text=self.prompt(), font=FONT)
+        self.prompt_label.pack(side="left")
         self.entry = tk.Entry(row, font=FONT)
         self.entry.pack(side="left", fill="x", expand=True)
         self.entry.bind("<Return>", self.on_enter)
         self.entry.focus()
+
+    def prompt(self):
+        """Вернуть приглашение с именем пользователя и текущим каталогом."""
+        return PROMPT_TEMPLATE.format(USER_NAME, self.shell.cwd_path())
 
     def write(self, text, tag=None):
         """Добавить текст в конец области вывода."""
@@ -63,7 +68,7 @@ class App:
 
     def run_command(self, line):
         """Показать и выполнить строку, вернуть статус выполнения."""
-        self.write(f"{PROMPT} {line}\n")
+        self.write(f"{self.prompt()} {line}\n")
         try:
             result = self.shell.execute(line)
         except ExitRequest:
@@ -72,6 +77,7 @@ class App:
         except CommandError as err:
             self.write(f"{err}\n", ERROR_TAG)
             return STATUS_ERROR
+        self.prompt_label.config(text=self.prompt())
         if result:
             self.write(result + "\n")
         return STATUS_OK

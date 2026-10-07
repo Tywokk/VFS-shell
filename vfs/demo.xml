@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vfs>
+  <file name="readme.txt">Демонстрационная VFS для этапа 4</file>
+  <file name=".hidden">скрытый файл</file>
+  <file name="data.bin" encoding="base64">AAECA/8=</file>
+  <dir name="home">
+    <dir name="user">
+      <file name="lines.txt">строка 1
+строка 2
+строка 3
+строка 4
+строка 5
+строка 6
+строка 7
+строка 8
+строка 9
+строка 10
+строка 11
+строка 12
+</file>
+      <file name="short.txt">первая
+вторая
+третья
+</file>
+      <dir name="docs">
+        <file name="report.txt">Отчёт</file>
+      </dir>
+      <dir name="empty"/>
+    </dir>
+  </dir>
+</vfs>

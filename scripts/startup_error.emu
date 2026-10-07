@@ -1,6 +1,6 @@
 # Скрипт с ошибкой: выполнение останавливается на foo
 ls
-cd /tmp
+cd /
 foo bar
 cd after_error
 exit

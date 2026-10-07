@@ -1,0 +1,46 @@
+# Этап 4: ls, cd, tail, whoami (все режимы) для vfs/demo.xml. Запуск:
+#   make run ARGS="--vfs vfs/demo.xml --script scripts/startup_stage4.emu"
+
+# whoami
+whoami
+
+# ls: корень, подробный формат, скрытые файлы, оба ключа сразу
+ls
+ls -l
+ls -a
+ls -la
+
+# ls с путями: каталог, подробно, несколько путей, файл, пустой каталог
+ls home
+ls -l home/user
+ls home home/user/docs
+ls readme.txt
+ls home/user/empty
+
+# cd: абсолютный путь, относительный, "..", ".", без аргумента
+cd /home/user
+ls
+cd docs
+cd ..
+cd ../..
+cd /home/user/docs
+cd .
+ls
+cd
+ls
+
+# tail: 10 строк по умолчанию, -n, несколько файлов, абсолютный путь
+cd /home/user
+tail lines.txt
+tail -n 3 lines.txt
+tail -n 0 lines.txt
+tail -n 100 short.txt
+tail short.txt docs/report.txt
+tail -n 2 short.txt lines.txt
+tail /readme.txt
+
+# ошибка: файла нет, скрипт остановится на этой строке
+tail no_such.txt
+
+# эта строка уже не выполнится
+exit

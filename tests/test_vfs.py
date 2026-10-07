@@ -5,7 +5,8 @@ import tempfile
 import unittest
 
 from src.vfs import (VDir, VFile, VfsError, count_nodes, default_vfs,
-                     get_vfs, load_vfs, summary, tree_lines)
+                     get_vfs, load_vfs, lookup, normalize, summary,
+                     tree_lines)
 
 SAMPLES = os.path.join(os.path.dirname(__file__), "..", "vfs")
 
@@ -105,6 +106,12 @@ class SamplesTest(unittest.TestCase):
         old = root.children["home"].children["user"].children["docs"]
         self.assertIn("draft.txt", old.children["old"].children)
 
+    def test_demo(self):
+        """Демонстрационная VFS для этапа 4."""
+        root = load_vfs(sample("demo.xml"))
+        self.assertEqual(count_nodes(root), (4, 6))
+        self.assertIn(".hidden", root.children)
+
     def test_broken_sample(self):
         """Некорректный пример даёт VfsError."""
         with self.assertRaises(VfsError):
@@ -135,3 +142,33 @@ class DefaultAndTreeTest(unittest.TestCase):
         """Строка отладочного вывода содержит числа."""
         text = summary(default_vfs())
         self.assertIn("каталогов: 1, файлов: 2", text)
+
+
+class PathTest(unittest.TestCase):
+    """Проверки разбора путей и поиска узлов."""
+
+    def test_absolute_path(self):
+        """Абсолютный путь не зависит от текущего каталога."""
+        self.assertEqual(normalize(["a"], "/b/c"), ["b", "c"])
+
+    def test_relative_path(self):
+        """Относительный путь считается от текущего каталога."""
+        self.assertEqual(normalize(["a"], "b/c"), ["a", "b", "c"])
+
+    def test_dot_and_parent(self):
+        """Точка и две точки обрабатываются, лишние / игнорируются."""
+        self.assertEqual(normalize(["a", "b"], "./../c//d/"),
+                         ["a", "c", "d"])
+
+    def test_parent_of_root(self):
+        """Выше корня подняться нельзя."""
+        self.assertEqual(normalize([], "../.."), [])
+
+    def test_lookup(self):
+        """Поиск находит файл и каталог, иначе возвращает None."""
+        root = load_vfs(sample("deep.xml"))
+        self.assertIs(lookup(root, []), root)
+        self.assertIsInstance(lookup(root, ["home", "user"]), VDir)
+        self.assertIsInstance(lookup(root, ["readme.txt"]), VFile)
+        self.assertIsNone(lookup(root, ["home", "nope"]))
+        self.assertIsNone(lookup(root, ["readme.txt", "x"]))

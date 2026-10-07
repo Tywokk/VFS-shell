@@ -1,4 +1,4 @@
-"""Тесты интерпретатора и команд-заглушек."""
+"""Тесты интерпретатора, команд exit и tree."""
 
 import unittest
 
@@ -15,15 +15,9 @@ def first_event(log):
 class ShellTest(unittest.TestCase):
     """Проверки выполнения команд."""
 
-    def test_ls_stub_prints_name_and_args(self):
-        """ls выводит своё имя и аргументы."""
-        out = Shell().execute("ls -l /tmp")
-        self.assertIn("ls", out)
-        self.assertIn("-l /tmp", out)
-
-    def test_cd_stub_without_args(self):
-        """cd без аргументов тоже работает."""
-        self.assertIn("cd", Shell().execute("cd"))
+    def test_starts_in_root(self):
+        """Текущий каталог в начале - корень."""
+        self.assertEqual(Shell().cwd_path(), "/")
 
     def test_empty_line(self):
         """Пустая строка ничего не выводит."""

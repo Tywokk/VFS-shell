@@ -1,8 +1,10 @@
-# Стартовый скрипт без ошибок
+# Стартовый скрипт без ошибок (подходит для любой VFS из папки vfs)
 ls
-ls -l /home
+ls -l
+ls -a
 
-cd docs
+cd /
 cd
+whoami
 tree
 exit
