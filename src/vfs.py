@@ -3,6 +3,8 @@
 import base64
 import xml.etree.ElementTree as ET
 
+from src.modes import DIR_MODE, FILE_MODE
+
 ROOT_TAG = "vfs"
 DIR_TAG = "dir"
 FILE_TAG = "file"
@@ -19,20 +21,22 @@ class VfsError(Exception):
 
 
 class VFile:
-    """Файл: имя и содержимое в байтах."""
+    """Файл: имя, содержимое в байтах и права доступа."""
 
-    def __init__(self, name, data=b""):
-        """Создать файл с именем и содержимым."""
+    def __init__(self, name, data=b"", mode=FILE_MODE):
+        """Создать файл с именем, содержимым и правами."""
         self.name = name
         self.data = data
+        self.mode = mode
 
 
 class VDir:
-    """Каталог: имя и вложенные файлы и каталоги."""
+    """Каталог: имя, права доступа и вложенные файлы и каталоги."""
 
-    def __init__(self, name):
-        """Создать пустой каталог."""
+    def __init__(self, name, mode=DIR_MODE):
+        """Создать пустой каталог с правами mode."""
         self.name = name
+        self.mode = mode
         self.children = {}
 
     def add(self, node):

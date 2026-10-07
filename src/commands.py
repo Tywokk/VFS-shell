@@ -1,7 +1,8 @@
-"""Команды эмулятора: ls, cd, tail, whoami, служебная tree и exit."""
+"""Команды эмулятора: ls, cd, tail, whoami, chmod, служебная tree и exit."""
 
 from src.config import USER_NAME
 from src.eventlog import EventLog
+from src.modes import apply_mode, mode_string
 from src.parser import parse
 from src.vfs import (SEP, VDir, default_vfs, lookup, normalize,
                      tree_lines)
@@ -53,7 +54,7 @@ def ls_entry(name, node, long_format):
         kind, size = "d", 0
     else:
         kind, size = "-", len(node.data)
-    return f"{kind} {size:>6} {name}"
+    return f"{kind}{mode_string(node.mode)} {size:>6} {name}"
 
 
 def ls_dir_lines(directory, options):
@@ -172,6 +173,24 @@ def cmd_whoami(shell, args):
     return USER_NAME
 
 
+def cmd_chmod(shell, args):
+    """chmod режим путь...: изменить права доступа (только в памяти)."""
+    if not args:
+        raise CommandError("chmod: не указан режим")
+    mode, *paths = args
+    if apply_mode(mode, 0) is None:
+        raise CommandError(f"chmod: неверный режим: {mode}")
+    if not paths:
+        raise CommandError(f"chmod: после '{mode}' не указан файл")
+    for path in paths:
+        node = shell.find(path)
+        if node is None:
+            raise CommandError(
+                f"chmod: {path}: нет такого файла или каталога")
+        node.mode = apply_mode(mode, node.mode)
+    return ""
+
+
 def cmd_tree(shell, args):
     """Служебная команда tree: показать всё содержимое VFS."""
     if args:
@@ -191,6 +210,7 @@ COMMANDS = {
     "cd": cmd_cd,
     "tail": cmd_tail,
     "whoami": cmd_whoami,
+    "chmod": cmd_chmod,
     "tree": cmd_tree,
     "exit": cmd_exit,
 }

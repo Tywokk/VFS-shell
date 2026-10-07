@@ -1,4 +1,4 @@
-"""Тесты команд ls, cd, tail и whoami."""
+"""Тесты команд ls, cd, tail, whoami и chmod."""
 
 import os
 import unittest
@@ -37,10 +37,10 @@ class LsTest(unittest.TestCase):
         self.assertEqual(out[:3], [".", "..", ".hidden"])
 
     def test_long(self):
-        """Ключ -l показывает тип и размер."""
+        """Ключ -l показывает тип, права и размер."""
         out = make_shell().execute("ls -l")
-        self.assertIn("d      0 home", out)
-        self.assertIn("-      5 data.bin", out)
+        self.assertIn("drwxr-xr-x      0 home", out)
+        self.assertIn("-rw-r--r--      5 data.bin", out)
 
     def test_combined_options(self):
         """Ключи можно писать слитно и по отдельности."""
@@ -213,3 +213,106 @@ class WhoamiTest(unittest.TestCase):
     def test_with_args_is_error(self):
         """whoami с аргументами - ошибка."""
         self.assertIn("слишком много", error_of("whoami x"))
+
+
+def perms_of(shell, name):
+    """Вернуть права (первые 10 символов ls -l) для имени в текущем каталоге."""
+    for line in shell.execute("ls -l").split("\n"):
+        if line.endswith(" " + name):
+            return line[:10]
+    raise AssertionError(f"нет в выводе ls -l: {name}")
+
+
+class ChmodTest(unittest.TestCase):
+    """Проверки команды chmod."""
+
+    def test_default_modes(self):
+        """По умолчанию у файла rw-r--r--, у каталога rwxr-xr-x."""
+        shell = make_shell()
+        self.assertEqual(perms_of(shell, "readme.txt"), "-rw-r--r--")
+        self.assertEqual(perms_of(shell, "home"), "drwxr-xr-x")
+
+    def test_octal_file(self):
+        """Числовой режим меняет права файла."""
+        shell = make_shell()
+        self.assertEqual(shell.execute("chmod 600 readme.txt"), "")
+        self.assertEqual(perms_of(shell, "readme.txt"), "-rw-------")
+
+    def test_octal_dir(self):
+        """Числовой режим меняет права каталога."""
+        shell = make_shell()
+        shell.execute("chmod 700 home")
+        self.assertEqual(perms_of(shell, "home"), "drwx------")
+
+    def test_several_paths(self):
+        """Один режим применяется ко всем указанным путям."""
+        shell = make_shell()
+        shell.execute("chmod 444 readme.txt data.bin")
+        self.assertEqual(perms_of(shell, "readme.txt"), "-r--r--r--")
+        self.assertEqual(perms_of(shell, "data.bin"), "-r--r--r--")
+
+    def test_symbolic_add(self):
+        """u+x добавляет право владельцу."""
+        shell = make_shell()
+        shell.execute("chmod u+x readme.txt")
+        self.assertEqual(perms_of(shell, "readme.txt"), "-rwxr--r--")
+
+    def test_symbolic_remove(self):
+        """go-r убирает право у группы и остальных."""
+        shell = make_shell()
+        shell.execute("chmod go-r readme.txt")
+        self.assertEqual(perms_of(shell, "readme.txt"), "-rw-------")
+
+    def test_symbolic_set(self):
+        """a=r заменяет права для всех."""
+        shell = make_shell()
+        shell.execute("chmod a=r readme.txt")
+        self.assertEqual(perms_of(shell, "readme.txt"), "-r--r--r--")
+
+    def test_symbolic_without_who(self):
+        """Без указания, для кого, режим применяется ко всем."""
+        shell = make_shell()
+        shell.execute("chmod +x readme.txt")
+        self.assertEqual(perms_of(shell, "readme.txt"), "-rwxr-xr-x")
+
+    def test_minus_mode_is_not_option(self):
+        """Режим, начинающийся с минуса, - это режим, а не опция."""
+        shell = make_shell()
+        shell.execute("chmod -r readme.txt")
+        self.assertEqual(perms_of(shell, "readme.txt"), "--w-------")
+
+    def test_relative_path(self):
+        """Путь может быть относительным."""
+        shell = make_shell()
+        shell.execute("cd home/user")
+        shell.execute("chmod 755 short.txt")
+        self.assertEqual(perms_of(shell, "short.txt"), "-rwxr-xr-x")
+
+    def test_vfs_file_not_changed(self):
+        """XML-файл VFS остаётся прежним, права только в памяти."""
+        with open(DEMO, "rb") as handle:
+            before = handle.read()
+        make_shell().execute("chmod 000 readme.txt")
+        with open(DEMO, "rb") as handle:
+            self.assertEqual(handle.read(), before)
+
+    def test_no_args(self):
+        """Без аргументов - ошибка."""
+        self.assertIn("не указан режим", error_of("chmod"))
+
+    def test_no_path(self):
+        """Только режим, без пути - ошибка."""
+        self.assertIn("не указан файл", error_of("chmod 755"))
+
+    def test_bad_octal(self):
+        """Цифры вне 0-7 и слишком длинная запись - ошибка."""
+        self.assertIn("неверный режим", error_of("chmod 999 readme.txt"))
+        self.assertIn("неверный режим", error_of("chmod 7777 readme.txt"))
+
+    def test_bad_symbolic(self):
+        """Неверная символьная запись - ошибка."""
+        self.assertIn("неверный режим", error_of("chmod u+q readme.txt"))
+
+    def test_missing_path(self):
+        """Несуществующий путь - ошибка."""
+        self.assertIn("нет такого файла", error_of("chmod 755 nope"))

@@ -1,0 +1,35 @@
+# Этап 5: chmod (все режимы) для vfs/demo.xml. Запуск:
+#   make run ARGS="--vfs vfs/demo.xml --script scripts/startup_stage5.emu"
+
+# права по умолчанию: файлы rw-r--r--, каталоги rwxr-xr-x
+ls -l
+
+# числовой режим: файл, каталог, несколько путей сразу
+chmod 600 readme.txt
+chmod 700 home
+chmod 444 data.bin .hidden
+ls -la
+
+# символьный режим: добавить (+), убрать (-), установить (=)
+chmod u+x readme.txt
+chmod go-r readme.txt
+chmod a=rw data.bin
+ls -l
+
+# без указания, для кого, и режим с минусом
+chmod +x data.bin
+chmod -w data.bin
+ls -l
+
+# абсолютный и относительный пути, каталог
+chmod 755 /home/user/short.txt
+cd home/user
+chmod 640 lines.txt
+chmod 500 docs
+ls -l
+
+# ошибка: цифры вне 0-7, скрипт остановится на этой строке
+chmod 999 lines.txt
+
+# эта строка уже не выполнится
+exit
