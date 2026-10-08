@@ -1,7 +1,7 @@
 """Виртуальная файловая система: хранится и обрабатывается в памяти."""
 
 import base64
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as etree
 
 from src.modes import DIR_MODE, FILE_MODE
 
@@ -92,8 +92,8 @@ def load_vfs(path):
         VfsError: если файл недоступен или имеет неверный формат.
     """
     try:
-        root = ET.parse(path).getroot()
-    except (OSError, ET.ParseError) as err:
+        root = etree.parse(path).getroot()
+    except (OSError, etree.ParseError) as err:
         raise VfsError(f"не удалось прочитать {path}: {err}") from err
     if root.tag != ROOT_TAG:
         raise VfsError(f"корневой элемент должен быть <{ROOT_TAG}>")

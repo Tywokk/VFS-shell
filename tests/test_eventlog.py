@@ -3,14 +3,14 @@
 import os
 import tempfile
 import unittest
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as etree
 
 from src.eventlog import EventLog
 
 
 def read_event(path):
     """Прочитать первое событие из XML-лога."""
-    return ET.parse(path).getroot().find("event")
+    return etree.parse(path).getroot().find("event")
 
 
 class EventLogTest(unittest.TestCase):

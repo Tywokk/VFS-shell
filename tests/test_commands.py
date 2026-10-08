@@ -129,10 +129,12 @@ class CdTest(unittest.TestCase):
 class TailTest(unittest.TestCase):
     """Проверки команды tail."""
 
-    def setUp(self):
-        """Перейти в каталог с тестовыми файлами."""
-        self.shell = make_shell()
-        self.shell.execute("cd /home/user")
+    @property
+    def shell(self):
+        """Оболочка, которая уже находится в каталоге /home/user."""
+        shell = make_shell()
+        shell.execute("cd /home/user")
+        return shell
 
     def lines(self, command):
         """Выполнить команду и вернуть вывод списком строк."""
